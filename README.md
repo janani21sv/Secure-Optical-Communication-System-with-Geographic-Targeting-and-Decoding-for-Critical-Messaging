@@ -1,0 +1,2 @@
+# Secure-Optical-Communication-System-with-Geographic-Targeting-and-Decoding-for-Critical-Messaging
+Optical Communication, Laser-Based  Transmission, Secure Data Transmission, Morse Code Encoding,  Image Processing, OpenCV-Based Decoding, Servo-Controlled System, Obstacle Avoidance,  Ultrasonic Sensors, Encryption, Decryption, Real-Time Signal  Processing, Android-Receiver, Wireless Communication, Disaster Communication, Military Applications
