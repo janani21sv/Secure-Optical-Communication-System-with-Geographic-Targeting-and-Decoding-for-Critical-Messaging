@@ -11,7 +11,6 @@ The proposed light-based communication system integrates laser diodes, servo mot
 
 2. Transmission Modes:
 The system supports two modes: Broadcast Mode and Targeted Mode.
-
 In Broadcast Mode, all servos start at 0°, and an ultrasonic sensor detects nearby obstacles. If an obstacle is detected, servo positions adjust by 5° to avoid interference. The message is then transmitted in Morse code through simultaneous laser diode blinking.
 In Targeted Mode, the user selects a specific target location via the GUI. The system identifies the nearest servo, aligns it with the target, encrypts the message using the Caesar cipher, converts it to Morse code, and transmits it via a single laser diode for precise, directed communication.
 
