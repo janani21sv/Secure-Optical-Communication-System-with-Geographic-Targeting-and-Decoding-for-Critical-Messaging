@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map & Console</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #map { height: 400px; width: 80%; margin: auto; border: 2px solid black; }
+        #console { height: 50px; width: 80%; margin: auto; border: 2px solid black; overflow-y: auto; background: #f4f4f4; padding: 10px; }
+        input, button { margin-top: 10px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Map</h2>
+    <div id="map"></div>
+
+    <h3>Follow Me!</h3>
+    <div id="console"></div>
+
+    <h3>Select Mode:</h3>
+    <button onclick="submitChoice(1)">Broadcast Mode</button>
+    <button onclick="submitChoice(2)">Targeted Mode</button>
+    <button onclick="submitChoice(3)">Exit</button>
+
+    <h3>Enter Message:</h3>
+    <input type="text" id="messageInput" placeholder="Enter message">
+    <button onclick="submitMessage()">Send</button>
+
+    <script>
+        var map = L.map('map').setView([10.904105, 76.900907], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+	var targetedMode = false;
+
+        map.on('click', function (e) {
+    	    let lat = e.latlng.lat.toFixed(6);
+            let lng = e.latlng.lng.toFixed(6);
+
+    	    if (targetedMode) {
+        	updateConsole(`Target Coordinates Selected: ${lat}, ${lng}`);
+        	fetch('/update_target_coords', {
+            	    method: 'POST',
+            	    headers: { 'Content-Type': 'application/json' },
+            	    body: JSON.stringify({ lat: lat, lng: lng })
+        	}).then(response => response.json());
+        	targetedMode = false; // Reset mode after selecting target
+    	    } else {
+        	updateConsole(`Selected Coordinates: ${lat}, ${lng}`);
+        	fetch('/update_coords', {
+            	    method: 'POST',
+            	    headers: { 'Content-Type': 'application/json' },
+            	    body: JSON.stringify({ lat: lat, lng: lng })
+        	}).then(response => response.json());
+    	    }
+	});
+
+
+        function submitChoice(choice) {
+	    targetedMode = (choice == 2);
+            fetch('/submit_choice', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ choice: choice.toString() })
+            }).then(response => response.json());
+        }
+
+        function submitMessage() {
+            let message = document.getElementById('messageInput').value;
+            fetch('/submit_message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            }).then(response =>{
+            if (response.ok) {
+            	fetchLogs(); // Immediately update the console
+            }
+         });
+        }
+
+        function fetchLogs() {
+            fetch('/log')
+                .then(response => response.json())
+                .then(logs => {
+                    let logDiv = document.getElementById("console");
+                    logDiv.innerHTML = logs.map(log => `<p>${log}</p>`).join("");
+                });
+        }
+        
+        function updateConsole(message) {
+            let logDiv = document.getElementById("console");
+            logDiv.innerHTML += `<p>${message}</p>`;
+        }
+
+
+        setInterval(fetchLogs, 1000);
+    </script>
+</body>
+</html>
